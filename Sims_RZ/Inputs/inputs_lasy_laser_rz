@@ -1,0 +1,147 @@
+#################################
+####### INFORMATION ######
+#################################
+
+
+#################################
+####### GENERAL PARAMETERS ######
+#################################
+max_step = 4000
+amr.n_cell = 512  1024
+amr.max_grid_size_z = 256
+amr.max_grid_size_x = 256
+amr.max_grid_size_y = 256
+
+amr.blocking_factor = 32 # minimum size of each AMReX box, used to decompose the domain
+geometry.dims = RZ
+geometry.prob_lo     =   0.   -30.e-6    # physical domain
+geometry.prob_hi     =  65.e-6    30.e-6
+amr.max_level = 0 # Maximum level in hierarchy (1 might be unstable, >1 is not supported)
+
+warpx.n_rz_azimuthal_modes = 2
+
+boundary.field_lo = none absorbing_silver_mueller
+boundary.field_hi = pec absorbing_silver_mueller
+
+#################################
+############ CONSTANTS ###########
+#################################
+my_constants.lam = 800.e-9       # wavelength m 
+
+my_constants.nc = 1.74e27        # Critical density m^-3
+
+my_constants.a0 = 2              # normalized vector potential
+
+my_constants.ne_0 = 0.001*nc       # density in terms if critical ~3.5e18 cm^3
+
+my_constants.wp = ((ne_0*q_e^2)/(m_e*epsilon0))^(1/2)            # plasma frequency
+
+my_constants.lam_p = (2*pi*clight)/wp                            # plasma wavelength
+
+my_constants.kp = (2*pi)/lam_p                                      # plasma wavenumber
+
+my_constants.Ld = (2/(3*pi))*(a0)^(1/2)*lam*(nc/ne_0)^(3/2)      # Dephasing length
+
+#my_constants.w0 = (2*(a0)^(1/2)) / kp                            # matched spot size
+
+my_constants.w0 = 1.1388200694674834e-05
+
+#my_constants.tauFWHM = ((2*(a0)^(1/2)) / kp) * (1/clight)        # matched pulse duration size
+
+my_constants.tauFWHM = 3.7986948606541775e-14
+
+my_constants.zmax = Ld      # match acclerator length to dephaing length for HQ bunches
+
+my_constants.zmin = -10.e-6     # start longitudinal length of channel 
+
+my_constants.xmax = 39.e-6      # max transverse length of channel 
+
+my_constants.xmin = -39.e-6      # start transverse length of channel 
+
+my_constants.ramp_up = 2*lam_p      # start transverse length of channel 
+
+my_constants.ramp_down = 2*lam_p      # start transverse length of channel 
+
+my_constants.plateau = (zmax - ramp_up - ramp_down)    # start transverse length of channel 
+
+my_constants.rc = 0.4*lam_p      # start transverse length of channel 
+
+my_constants.vg = (1 - (0.5*(0.002)))         # Group velocity normalized to speed of light
+
+
+#################################
+####### WINDOW##################
+#################################
+warpx.do_moving_window = 1
+warpx.moving_window_dir = z
+warpx.moving_window_v = vg # units of speed of light
+warpx.start_moving_window_step = 1693
+
+
+
+#################################
+############ NUMERICS ###########
+#################################
+warpx.verbose = 1
+#warpx.use_filter = 1
+#warpx.filter_npass_each_dir = 0 1
+warpx.cfl = 0.999 # if 1., the time step is set to its CFL limit
+# Order of particle shape factors
+algo.particle_shape = 3
+
+#################################
+############ PLASMA #############
+#################################
+#particles.species_names = electrons ions
+
+#electrons.charge = -q_e
+#electrons.mass = m_e
+#electrons.injection_style = NUniformPerCell
+#electrons.num_particles_per_cell_each_dim = 1 4 1
+#electrons.momentum_distribution_type = "at_rest"
+#electrons.xmin = xmin
+#electrons.xmax = xmax
+#electrons.zmin = zmin
+#electrons.zmax = zmax
+#electrons.profile = constant
+#electrons.density = ne_0 
+#electrons.do_continuous_injection = 1
+
+#ions.charge = q_e
+#ions.mass = m_p
+#ions.injection_style = NUniformPerCell
+#ions.num_particles_per_cell_each_dim = 1 4 1
+#ions.momentum_distribution_type = "at_rest"
+#ions.xmin = xmin
+#ions.xmax = xmax
+#ions.zmin = zmin
+#ions.zmax = zmax
+#ions.profile = constant
+#ions.density = ne_0 
+#ions.do_continuous_injection = 1
+
+
+#################################
+############ LASER ##############
+#################################
+lasers.names        = TA3
+TA3.position     = 0. 0. -29.e-6 # This point is on the laser plane
+TA3.direction    = 0. 0. 1.     # The plane normal direction
+TA3.polarization = 0. 1. 0.     # The main polarization vector
+TA3.e_max        = 1.258e+13        # Maximum amplitude of the laser field (in V/m)
+TA3.wavelength = 0.8e-6         # The wavelength of the laser (in meters)
+TA3.profile      = from_file
+TA3.time_chunk_size = 50
+TA3.lasy_file_name = "/Users/victorflores/warpx_env/WarpX/Runs_Rz/Laser_Test/TA3_pulse_00000.h5"
+TA3.delay = 9.67335876074641e-14
+
+#################################
+############ DIAGNOSTICS ##############
+#################################
+diagnostics.diags_names = diag1
+diag1.intervals = 200
+diag1.write_species = 0
+diag1.diag_type = Full
+diag1.fields_to_plot = Er Et Ez 
+diag1.format = openpmd
+diag1.openpmd_backend = h5
