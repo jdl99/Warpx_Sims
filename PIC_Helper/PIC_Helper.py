@@ -14,7 +14,6 @@ import matplotlib.pyplot as plt
 
 
 
-
 q_e = cons.elementary_charge
 m_e = cons.electron_mass
 epsilon0 = cons.epsilon_0
@@ -129,3 +128,44 @@ def sim_RZ_para(lam,r,z,ncells,mode,max_grid_size,gpus):
         "boxes": total_boxes,
         'decompose':list_of_possible_breakdowns,
     }
+
+
+def key_times(lam, dt, pulse_duration, t_peak, stop_time, st_dist):
+    
+    sti = stop_time/dt
+    t_full_pulse_s = t_peak + pulse_duration/np.sqrt(2*np.log(2))    
+    t_full_pulse_i = t_full_pulse_s / dt
+    t_peak_on_target_s = t_peak + st_dist/clight
+    t_peak_on_target_i = t_peak_on_target_s / dt
+    t_full_pulse_dur_reflect_s = t_peak_on_target_s + st_dist/clight + pulse_duration/np.sqrt(2*np.log(2))
+    t_full_pulse_dur_reflect_i = t_full_pulse_dur_reflect_s / dt
+    nq_laser_s = lam/2/clight
+    nq_laser_i = nq_laser_s / dt
+
+    
+    return{
+        "stop time (s)": stop_time,
+        "stop time (it)": sti,
+        "t full pulse initialized (s)": t_full_pulse_s,
+        "t full pulse initialized (it)": t_full_pulse_i,
+        "t peak on target (s)": t_peak_on_target_s,
+        "t peak on target (it": t_peak_on_target_i,
+        "t full pulse dur. returns to antenna (s)": t_full_pulse_dur_reflect_s,
+        "t full pulse dur. returns to antenna (it)": t_full_pulse_dur_reflect_i,
+        "laser nq freq (s)": nq_laser_s,
+        "laser nq freq (it)": nq_laser_i
+    }
+
+#%%
+
+lam = 400e-9
+r = 25e-6
+z = (-30e-6, 30e-6)
+ncells = (4096, 12096)
+mode = 2
+max_grid_size = (512,512)
+gpus = 2
+
+params = sim_RZ_para(lam, r, z, ncells, mode, max_grid_size, gpus)
+
+key_times(lam, params["dt"], 45e-15, 90e-15, 350e-15, 29e-6)
